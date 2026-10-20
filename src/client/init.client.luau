@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Networker = require(ReplicatedStorage.Packages.Networker)
 
-type Networker = Networker.Client
+local Swim = require(script.Controllers.Swim)
+Swim.init()
 
-print("Hello world, from client!")
+local DoubleJump = require(script.Controllers.DoubleJump)
+DoubleJump.init()

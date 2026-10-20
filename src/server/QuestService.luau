@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
+local Progression = require(script.Parent.Progression)
 
 local Quests = require(ReplicatedStorage.Shared.Quests)
 local QuestTypes = require(ReplicatedStorage.Shared.QuestTypes)
@@ -13,14 +14,11 @@ local states: { [Player]: QuestState } = {}
 local questUpdate: RemoteEvent
 
 local function setupLeaderstats(player: Player)
-	local stats = Instance.new("Folder")
-	stats.Name = "leaderstats"
-	stats.Parent = player
-
-	for _, name in { "XP", "Gold" } do
-		local value = Instance.new("IntValue")
-		value.Name = name
-		value.Parent = stats
+	local stats = Progression.GetLeaderstats(player)
+	if not stats:FindFirstChild("Gold") then
+		local gold = Instance.new("IntValue")
+		gold.Name = "Gold"
+		gold.Parent = stats
 	end
 end
 
@@ -45,7 +43,7 @@ end
 local function handleTalk(player: Player)
 	local state = states[player]
 
-	if not state then
+	if not state or state.status == "done" then
 		states[player] = { questId = "kill_bandits", progress = 0, status = "active" }
 		questUpdate:FireClient(player, buildPayload(states[player]))
 		return
@@ -56,11 +54,11 @@ local function handleTalk(player: Player)
 	if state.status == "active" and state.progress >= quest.Amount then
 		state.status = "done"
 
+		Progression.AddXP(player, quest.Reward.XP)
+
 		local stats = player:FindFirstChild("leaderstats")
-		local xp = stats and stats:FindFirstChild("XP") :: IntValue?
 		local gold = stats and stats:FindFirstChild("Gold") :: IntValue?
-		if xp and gold then
-			xp.Value += quest.Reward.XP
+		if gold then
 			gold.Value += quest.Reward.Gold
 		end
 	end
@@ -84,6 +82,7 @@ function QuestService.OnEnemyKilled(enemyName: string, userId: number?)
 		questUpdate:FireClient(player, buildPayload(state))
 	end
 end
+Progression.Start()
 
 function QuestService.Start(remote: RemoteEvent)
 	questUpdate = remote

@@ -3,7 +3,7 @@ local Workspace = game:GetService("Workspace")
 
 local COOLDOWN = 0.5
 local RANGE = 8
-local FIST_DAMAGE = 5
+local FIST_DAMAGE = 20
 
 -- Más adelante: leer arma equipada, nivel, bonos, etc.
 local function getDamage(player: Player): number

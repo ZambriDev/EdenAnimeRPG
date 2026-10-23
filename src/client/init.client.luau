@@ -5,8 +5,12 @@ local UserInputService = game:GetService("UserInputService")
 local Swim = require(script.Controllers.Swim)
 Swim.init()
 
+local Dash = require(script.Controllers.Dash)
+Dash.init()
+
 local DoubleJump = require(script.Controllers.DoubleJump)
 DoubleJump.init()
+
 local QuestTypes = require(ReplicatedStorage.Shared.QuestTypes)
 
 local remotes = ReplicatedStorage:WaitForChild("Remotes")
